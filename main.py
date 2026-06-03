@@ -67,11 +67,17 @@ class CollectiveWM:
             x_pos = i * window_width
             y_pos = 0
             
-            # Configure window position and size
+            # Configure window position, size, AND bring it to the top (Above)
             self.conn.core.ConfigureWindow(
                 window=window_id,
-                value_mask=xproto.ConfigWindow.X | xproto.ConfigWindow.Y | xproto.ConfigWindow.Width | xproto.ConfigWindow.Height,
-                value_list=[x_pos, y_pos, window_width, window_height]
+                value_mask=(
+                    xproto.ConfigWindow.X | 
+                    xproto.ConfigWindow.Y | 
+                    xproto.ConfigWindow.Width | 
+                    xproto.ConfigWindow.Height |
+                    xproto.ConfigWindow.StackMode
+                ),
+                value_list=[x_pos, y_pos, window_width, window_height, xproto.StackMode.Above]
             )
             
         self.conn.flush()
@@ -81,14 +87,19 @@ class CollectiveWM:
         width = self.screen.width_in_pixels
         height = self.screen.height_in_pixels
         
+        # Configure window size and restack it above others
         self.conn.core.ConfigureWindow(
             window=window_id,
-            value_mask=xproto.ConfigWindow.X | xproto.ConfigWindow.Y | xproto.ConfigWindow.Width | xproto.ConfigWindow.Height,
-            value_list=[0, 0, width, height]
+            value_mask=(
+                xproto.ConfigWindow.X | 
+                xproto.ConfigWindow.Y | 
+                xproto.ConfigWindow.Width | 
+                xproto.ConfigWindow.Height |
+                xproto.ConfigWindow.StackMode
+            ),
+            value_list=[0, 0, width, height, xproto.StackMode.Above]
         )
         
-        # Raise window to top using the correct method name
-        self.conn.core.RaiseWindow(window=window_id)
         self.conn.flush()
 
     def run(self):
