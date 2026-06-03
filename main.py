@@ -88,7 +88,7 @@ class CollectiveWM:
         )
         
         # Raise window to top using the correct method name
-        self.conn.core.XRaiseWindow(window=window_id)
+        self.conn.core.RaiseWindow(window=window_id)
         self.conn.flush()
 
     def run(self):
