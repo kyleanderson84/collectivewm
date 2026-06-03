@@ -15,11 +15,21 @@ class CollectiveWM:
         # Get the setup data and the primary screen
         self.setup = self.conn.get_setup()
         self.screen = self.setup.roots[0]
+        self.root = self.screen.root  # Reference to the root window
         print(f"CollectiveWM initialized on screen size: {self.screen.width_in_pixels}x{self.screen.height_in_pixels}")
         
         # Track managed windows
         self.windows = []
         self.current_window_count = 0
+
+        # Become the Window Manager by subbing to SubstructureRedirect
+        try:
+            mask = xproto.EventMask.SubstructureRedirect | xproto.EventMask.SubstructureNotify
+            self.conn.core.ChangeWindowAttributes(self.root, xproto.CW.EventMask, [mask])
+            self.conn.flush()
+        except xcffib.AccessError:
+            print("Error: Another window manager is already running.", file=sys.stderr)
+            sys.exit(1)
 
     def handle_new_window(self, window_id):
         """Handle a new window being created"""
@@ -91,15 +101,29 @@ class CollectiveWM:
             while True:
                 # Wait for events sent by the X server (keystrokes, new windows, mouse clicks)
                 event = self.conn.wait_for_event()
-                if event:
-                    # Handle different types of events
-                    if isinstance(event, xproto.CreateNotifyEvent):
-                        # New window created
-                        self.handle_new_window(event.window)
-                    elif isinstance(event, xproto.MapRequestEvent):
-                        # Window mapping request
-                        self.conn.core.MapWindow(window=event.window)
-                    # Add more event handlers as needed
+                
+                # Use MapRequest instead of CreateNotify for tiling
+                if isinstance(event, xproto.MapRequestEvent):
+                    wid = event.window
+                    
+                    # Only manage the window if we aren't already
+                    if wid not in self.windows:
+                        # 1. Map the window so it's visible
+                        self.conn.core.MapWindow(wid)
+                        # 2. Add to our collective and trigger the layout
+                        self.handle_new_window(wid)
+                        
+                elif isinstance(event, xproto.UnmapNotifyEvent):
+                    # Handle windows closing so the layout shrinks back
+                    if event.window in self.windows:
+                        self.windows.remove(event.window)
+                        self.current_window_count -= 1
+                        if self.current_window_count > 0:
+                            self.split_screen_vertically()
+                        else:
+                            # If no windows left, make the first window fullscreen again
+                            self.set_fullscreen(self.windows[0]) if self.windows else None
+
         except (KeyboardInterrupt, SystemExit):
             print("\nShutting down CollectiveWM. Power to the users.")
         finally:
