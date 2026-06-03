@@ -74,9 +74,6 @@ class CollectiveWM:
                 value_list=[x_pos, y_pos, window_width, window_height]
             )
             
-            # Raise window to top
-            self.conn.core.RaiseWindow(window=window_id)
-            
         self.conn.flush()
 
     def set_fullscreen(self, window_id):
@@ -90,8 +87,8 @@ class CollectiveWM:
             value_list=[0, 0, width, height]
         )
         
-        # Raise window to top
-        self.conn.core.RaiseWindow(window=window_id)
+        # Raise window to top using the correct method name
+        self.conn.core.XRaiseWindow(window=window_id)
         self.conn.flush()
 
     def run(self):
@@ -122,7 +119,8 @@ class CollectiveWM:
                             self.split_screen_vertically()
                         else:
                             # If no windows left, make the first window fullscreen again
-                            self.set_fullscreen(self.windows[0]) if self.windows else None
+                            if self.windows:
+                                self.set_fullscreen(self.windows[0])
 
         except (KeyboardInterrupt, SystemExit):
             print("\nShutting down CollectiveWM. Power to the users.")
