@@ -59,7 +59,7 @@ class CollectiveWM:
         height = self.screen.height_in_pixels
         
         # Calculate window sizes
-        window_width = width // 2
+        window_width = width // self.current_window_count
         window_height = height
         
         # Position windows side by side
