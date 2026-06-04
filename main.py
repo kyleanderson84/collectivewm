@@ -58,8 +58,8 @@ class CollectiveWM:
         width = self.screen.width_in_pixels
         height = self.screen.height_in_pixels
         
-        # Calculate window sizes
-        window_width = width // self.current_window_count
+        # Calculate window sizes - split screen into two equal vertical halves
+        window_width = width // 2
         window_height = height
         
         # Position windows side by side
