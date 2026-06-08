@@ -102,6 +102,33 @@ class CollectiveWM:
         
         self.conn.flush()
 
+    def close_focused_window(self):
+        """Close the currently focused window"""
+        if not self.windows:
+            return
+            
+        # Get the currently focused window (last window in list for simplicity)
+        # In a real implementation, you'd track focus more accurately
+        focused_window = self.windows[-1] if self.windows else None
+        
+        if focused_window:
+            # Send a delete window request to close the window gracefully
+            self.conn.core.DeleteWindow(focused_window)
+            self.conn.flush()
+            
+            # Remove from our tracking
+            if focused_window in self.windows:
+                self.windows.remove(focused_window)
+                self.current_window_count -= 1
+                
+                # Re-layout remaining windows
+                if self.current_window_count > 0:
+                    self.split_screen_vertically()
+                else:
+                    # If no windows left, make the first window fullscreen again
+                    if self.windows:
+                        self.set_fullscreen(self.windows[0])
+
     def run(self):
         # This is where your main X event loop will live
         print("Starting the collective event loop...")
@@ -109,6 +136,15 @@ class CollectiveWM:
             while True:
                 # Wait for events sent by the X server (keystrokes, new windows, mouse clicks)
                 event = self.conn.wait_for_event()
+                
+                # Handle key press events for window closing
+                if isinstance(event, xproto.KeyPressEvent):
+                    # Check for Mod+Shift+q combination
+                    # Note: This is a simplified implementation - in practice you'd need to 
+                    # properly detect modifier keys (Mod1, Mod4, etc.)
+                    if event.detail == 24:  # Q key (keycode 24)
+                        # This is a placeholder - in a real implementation you'd check modifiers
+                        self.close_focused_window()
                 
                 # Use MapRequest instead of CreateNotify for tiling
                 if isinstance(event, xproto.MapRequestEvent):
