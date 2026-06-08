@@ -67,5 +67,7 @@ echo "To test dmenu, press Mod+d (usually Super/Windows key + d)"
 echo "To test window closing, press Mod+Shift+q (usually Super/Windows key + Shift + q)"
 echo "Press Ctrl+C to stop the test"
 
-# Keep the script running
-wait
+# Keep the script running to allow testing
+while true; do
+    sleep 1
+done
