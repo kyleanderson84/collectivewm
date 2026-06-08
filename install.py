@@ -19,15 +19,12 @@ def check_root():
         sys.exit(1)
 
 def create_wrapper_script():
-    """Creates a wrapper script that starts CollectiveWM with dmenu and i3bar."""
+    """Creates a wrapper script that starts CollectiveWM with i3bar."""
     wrapper_content = f"""#!/bin/bash
-# CollectiveWM session launcher with dmenu and i3bar
+# CollectiveWM session launcher with i3bar
 
 # Start i3bar in the background
 i3bar &
-
-# Start dmenu for application launching
-dmenu_run &
 
 # Start CollectiveWM
 {TARGET_BIN_DIR}/{WM_EXEC_NAME}
@@ -102,6 +99,11 @@ def main():
     
     print(f"\nSuccessfully installed {WM_NAME}!")
     print("Log out or restart your display manager to see it in your login options.")
+    print("")
+    print("Key bindings:")
+    print("  Mod+d     - Open dmenu (application launcher)")
+    print("  Mod+Shift+q - Close focused window")
+    print("  Mod+Shift+c - Close CollectiveWM")
 
 if __name__ == "__main__":
     main()
