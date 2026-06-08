@@ -23,7 +23,6 @@ cleanup() {
     pkill -f "$WM_EXEC_NAME" 2>/dev/null || true
     pkill -f "dmenu" 2>/dev/null || true
     pkill -f "i3bar" 2>/dev/null || true
-    rm -rf "$LOG_DIR"
 }
 trap cleanup EXIT
 
