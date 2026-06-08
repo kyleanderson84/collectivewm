@@ -31,11 +31,17 @@ echo "Starting CollectiveWM test with Xephyr..."
 
 # Launch Xephyr with 1024x768 screen
 echo "Starting Xephyr on display $TEST_DISPLAY..."
-Xephyr -screen 1024x768 $TEST_DISPLAY &
+Xephyr -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.log" 2>&1 &
 XEPHYR_PID=$!
 
 # Wait for Xephyr to start
-sleep 1
+sleep 2
+
+# Check if Xephyr is still running
+if ! ps -p $XEPHYR_PID > /dev/null 2>&1; then
+    echo "Error: Xephyr failed to start properly. Check logs in $LOG_DIR"
+    exit 1
+fi
 
 # Set DISPLAY to our test display
 export DISPLAY=$TEST_DISPLAY
@@ -61,6 +67,22 @@ WM_PID=$!
 
 # Give everything time to initialize
 sleep 3
+
+# Verify that all processes are still running
+if ! ps -p $WM_PID > /dev/null 2>&1; then
+    echo "Error: CollectiveWM failed to start properly. Check logs in $LOG_DIR"
+    exit 1
+fi
+
+if ! ps -p $IBAR_PID > /dev/null 2>&1; then
+    echo "Error: i3bar failed to start properly. Check logs in $LOG_DIR"
+    exit 1
+fi
+
+if ! ps -p $DMENU_PID > /dev/null 2>&1; then
+    echo "Error: dmenu failed to start properly. Check logs in $LOG_DIR"
+    exit 1
+fi
 
 echo "Test started successfully!"
 echo "CollectiveWM PID: $WM_PID"
