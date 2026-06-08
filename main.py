@@ -157,6 +157,18 @@ class CollectiveWM:
                     if self.windows:
                         self.set_fullscreen(self.windows[0])
 
+    def open_dmenu(self):
+        """Open dmenu application launcher"""
+        import subprocess
+        try:
+            # Start dmenu in the background
+            subprocess.Popen(["dmenu_run"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("dmenu launched")
+        except FileNotFoundError:
+            print("Error: dmenu not found. Please install dmenu to use this feature.")
+        except Exception as e:
+            print(f"Error launching dmenu: {e}")
+
     def run(self):
         print("Starting the collective event loop...")
         try:
@@ -176,21 +188,18 @@ class CollectiveWM:
                             if self.current_window_count > 0:
                                 self.split_screen_vertically()
                     
-                    # Handle key press events for window closing
+                    # Handle key press events for window management
                     elif isinstance(event, xproto.KeyPressEvent):
-                        # Check for Mod+Shift+q combination
-                        # We need to check both the key code and modifier state
-                        # Keycode for 'q' is 24
-                        # Modifiers: Mod4 (Super/Windows) = 0x40, Shift = 0x1
-                        # So Mod+Shift+q would be: Mod4 + Shift + keycode 24
-                        
-                        # For now, we'll just check if it's the 'q' key
-                        # In a real implementation, you'd check the state field of the event
+                        # Check for Mod+Shift+q combination (close window)
                         if event.detail == 24:  # Q key (keycode 24)
-                            # This is a placeholder - in a real implementation you'd check modifiers
-                            # The actual implementation would need to check event.state for modifier keys
-                            self.close_focused_window()
-                            
+                            # Check if Mod4 (Super/Windows) and Shift are pressed
+                            # Mod4 = 0x40, Shift = 0x1
+                            if event.state & 0x41 == 0x41:  # Mod4 + Shift
+                                self.close_focused_window()
+                            # Check if just Mod4 (Super/Windows) is pressed for dmenu
+                            elif event.state & 0x40 == 0x40:  # Just Mod4
+                                self.open_dmenu()
+                                
         except (KeyboardInterrupt, SystemExit):
             print("\nShutting down CollectiveWM. Power to the users.")
         finally:
