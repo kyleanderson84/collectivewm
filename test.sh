@@ -44,19 +44,19 @@ export DISPLAY=$TEST_DISPLAY
 echo "Starting CollectiveWM with dmenu and i3bar..."
 echo "Logging to $LOG_DIR"
 
-# Start i3bar in background
+# Start i3bar in background with proper DISPLAY
 echo "Starting i3bar..."
-i3bar > "$LOG_DIR/i3bar.log" 2>&1 &
+DISPLAY=$TEST_DISPLAY i3bar > "$LOG_DIR/i3bar.log" 2>&1 &
 IBAR_PID=$!
 
-# Start dmenu in background  
+# Start dmenu in background with proper DISPLAY  
 echo "Starting dmenu..."
-dmenu_run > "$LOG_DIR/dmenu.log" 2>&1 &
+DISPLAY=$TEST_DISPLAY dmenu_run > "$LOG_DIR/dmenu.log" 2>&1 &
 DMENU_PID=$!
 
-# Start CollectiveWM
+# Start CollectiveWM with proper DISPLAY
 echo "Starting CollectiveWM..."
-./$WM_EXEC_NAME > "$LOG_DIR/collectivewm.log" 2>&1 &
+DISPLAY=$TEST_DISPLAY ./$WM_EXEC_NAME > "$LOG_DIR/collectivewm.log" 2>&1 &
 WM_PID=$!
 
 # Give everything time to initialize
