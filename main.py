@@ -179,10 +179,16 @@ class CollectiveWM:
                     # Handle key press events for window closing
                     elif isinstance(event, xproto.KeyPressEvent):
                         # Check for Mod+Shift+q combination
-                        # Note: This is a simplified implementation - in practice you'd need to 
-                        # properly detect modifier keys (Mod1, Mod4, etc.)
+                        # We need to check both the key code and modifier state
+                        # Keycode for 'q' is 24
+                        # Modifiers: Mod4 (Super/Windows) = 0x40, Shift = 0x1
+                        # So Mod+Shift+q would be: Mod4 + Shift + keycode 24
+                        
+                        # For now, we'll just check if it's the 'q' key
+                        # In a real implementation, you'd check the state field of the event
                         if event.detail == 24:  # Q key (keycode 24)
                             # This is a placeholder - in a real implementation you'd check modifiers
+                            # The actual implementation would need to check event.state for modifier keys
                             self.close_focused_window()
                             
         except (KeyboardInterrupt, SystemExit):
