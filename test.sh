@@ -10,7 +10,7 @@ set -e
 LOG_DIR="./test_logs"
 TEST_DISPLAY=":99"
 WM_NAME="CollectiveWM"
-WM_EXEC_NAME="collectivewm"
+WM_EXEC_NAME="main.py"
 WRAPPER_SCRIPT_NAME="collectivewm-session"
 
 # Create log directory
