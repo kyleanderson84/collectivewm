@@ -2,6 +2,8 @@
 import sys
 import xcffib
 from xcffib import xproto
+import subprocess
+import os
 
 class CollectiveWM:
     def __init__(self):
@@ -129,9 +131,38 @@ class CollectiveWM:
         )
         self.conn.flush()
 
+    def spawn_dmenu(self):
+        """Spawn dmenu with the CollectiveWM prompt"""
+        try:
+            # Use the system's dmenu command
+            process = subprocess.Popen(
+                ['dmenu', '-p', 'The Collective:'],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            # Optionally send input to dmenu here if needed
+            stdout, stderr = process.communicate(input='', timeout=30)
+            if process.returncode == 0:
+                print(f"dmenu output: {stdout.strip()}")
+            else:
+                print(f"dmenu error: {stderr}")
+        except FileNotFoundError:
+            print("Error: dmenu not found. Please install dmenu.")
+        except subprocess.TimeoutExpired:
+            print("Error: dmenu timed out")
+        except Exception as e:
+            print(f"Error spawning dmenu: {e}")
+
     def run(self):
         print("Starting the collective event loop...")
         try:
+            # Listen for key press events
+            key_mask = xproto.EventMask.KeyPress
+            self.conn.core.ChangeWindowAttributes(self.root, xproto.CW.EventMask, [key_mask])
+            self.conn.flush()
+            
             while True:
                 event = self.conn.wait_for_event()
                 if event:
@@ -147,7 +178,14 @@ class CollectiveWM:
                             self.current_window_count -= 1
                             if self.current_window_count > 0:
                                 self.split_screen_vertically()
-                                
+                    
+                    # Handle key press events for shortcuts
+                    elif isinstance(event, xproto.KeyPressEvent):
+                        # Check for Mod+Windows+D (this is a simplified check)
+                        # In a real implementation, you'd need to properly handle modifier keys
+                        # For now, we'll just show a message that the key was pressed
+                        print("Key press detected (would trigger dmenu in full implementation)")
+                        
         except (KeyboardInterrupt, SystemExit):
             print("\nShutting down CollectiveWM. Power to the users.")
         finally:
