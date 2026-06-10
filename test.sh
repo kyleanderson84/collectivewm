@@ -30,8 +30,7 @@ echo "Starting CollectiveWM test with Xephyr..."
 # ==============================================================================
 echo "Starting Xephyr on display $TEST_DISPLAY..."
 # Added -ac and -no-host-grab to ensure local clients can connect seamlessly
-# Also added -listen tcp to ensure proper event forwarding
-Xephyr -br -ac -no-host-grab -listen tcp -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.log" 2>&1 &
+Xephyr -br -ac -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.log" 2>&1 &
 XEPHYR_PID=$!
 
 # ==============================================================================
