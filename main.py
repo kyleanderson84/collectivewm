@@ -181,10 +181,11 @@ class CollectiveWM:
                     
                     # Handle key press events for shortcuts
                     elif isinstance(event, xproto.KeyPressEvent):
-                        # Check for Mod+Windows+D (this is a simplified check)
-                        # In a real implementation, you'd need to properly handle modifier keys
-                        # For now, we'll just show a message that the key was pressed
-                        print("Key press detected (would trigger dmenu in full implementation)")
+                        # Print the key event details for debugging
+                        print(f"KeyPressEvent: detail={event.detail}, state={event.state}")
+                        # For now, we'll just show that we're receiving key events
+                        # In a real implementation, you'd want to properly parse modifiers
+                        # and detect the Mod+Windows+D combination
                         
         except (KeyboardInterrupt, SystemExit):
             print("\nShutting down CollectiveWM. Power to the users.")

@@ -30,13 +30,13 @@ echo "Starting CollectiveWM test with Xephyr..."
 # ==============================================================================
 echo "Starting Xephyr on display $TEST_DISPLAY..."
 # Added -ac and -no-host-grab to ensure local clients can connect seamlessly
-Xephyr -br -ac -no-host-grab -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.log" 2>&1 &
+# Also added -listen tcp to ensure proper event forwarding
+Xephyr -br -ac -no-host-grab -listen tcp -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.log" 2>&1 &
 XEPHYR_PID=$!
 
 # ==============================================================================
 # FIX: Dynamic Socket Polling (Eliminates the Race Condition)
 # ==============================================================================
-sleep 5
 echo "Waiting for Xephyr socket to initialize..."
 
 # Strip the leading colon from ":99" to get "99" for the filename
@@ -59,7 +59,6 @@ echo "Xephyr socket detected! Proceeding..."
 
 # ==============================================================================
 # 2. Robust Guard: Wait explicitly for X-Server Socket to exist
-#!/bin/bash
 # ==============================================================================
 # Check if Xephyr process is actually still alive
 if ! kill -0 $XEPHYR_PID 2>/dev/null; then
@@ -81,7 +80,7 @@ python3 -u "./$WM_EXEC_NAME" > "$LOG_DIR/collectivewm.log" 2>&1 &
 WM_PID=$!
 
 # Give the Python window manager loop a clean moment to bind to X11 events
-sleep 0.5
+sleep 1
 
 # Verify that CollectiveWM didn't instantly drop its connection
 if ! kill -0 $WM_PID 2>/dev/null; then
