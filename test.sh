@@ -20,7 +20,6 @@ cleanup() {
     echo "Cleaning up..."
     pkill -f "Xephyr $TEST_DISPLAY" 2>/dev/null || true
     pkill -f "$WM_EXEC_NAME" 2>/dev/null || true
-    pkill -f "i3bar" 2>/dev/null || true
     pkill -f "dmenu" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -92,11 +91,6 @@ fi
 # ==============================================================================
 # 5. Spawn Associated Desktop Tools Into the Active WM Environment
 # ==============================================================================
-echo "Starting i3bar..."
-# i3bar will automatically look for its configuration or parent shell
-i3bar > "$LOG_DIR/i3bar.log" 2>&1 &
-IBAR_PID=$!
-
 echo "Starting dmenu (idle mode)..."
 # Instead of closing stdin via dev/null (which makes dmenu map and quit or crash), 
 # we keep an idle tail pipe open so it runs cleanly in the background.
