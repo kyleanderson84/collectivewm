@@ -20,7 +20,6 @@ cleanup() {
     echo "Cleaning up..."
     pkill -f "Xephyr $TEST_DISPLAY" 2>/dev/null || true
     pkill -f "$WM_EXEC_NAME" 2>/dev/null || true
-    pkill -f "dmenu" 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -87,15 +86,6 @@ if ! kill -0 $WM_PID 2>/dev/null; then
     echo "Error: CollectiveWM failed to start properly. Check $LOG_DIR/collectivewm.log"
     exit 1
 fi
-
-# ==============================================================================
-# 5. Spawn Associated Desktop Tools Into the Active WM Environment
-# ==============================================================================
-echo "Starting dmenu (idle mode)..."
-# Instead of closing stdin via dev/null (which makes dmenu map and quit or crash), 
-# we keep an idle tail pipe open so it runs cleanly in the background.
-tail -f /dev/null | dmenu -p "The Collective:" > "$LOG_DIR/dmenu.log" 2>&1 &
-DMENU_PID=$!
 
 # Final stabilization wait
 sleep 1
