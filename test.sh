@@ -36,13 +36,16 @@ Xephyr -br -ac -no-host-grab -screen 1024x768 $TEST_DISPLAY > "$LOG_DIR/xephyr.l
 XEPHYR_PID=$!
 
 # ==============================================================================
-# 2. Robust Guard: Wait explicitly for X-Server Socket to exist
+# FIX: Dynamic Socket Polling (Eliminates the Race Condition)
 # ==============================================================================
 echo "Waiting for Xephyr socket to initialize..."
+
+# Strip the leading colon from ":99" to get "99" for the filename
 SOCKET_FILE="/tmp/.X11-unix/X${TEST_DISPLAY#:}"
 MAX_ATTEMPTS=30
 ATTEMPT=0
 
+# Loop until the socket file exists on the filesystem
 while [ ! -e "$SOCKET_FILE" ]; do
     sleep 0.1
     ATTEMPT=$((ATTEMPT + 1))
@@ -52,6 +55,12 @@ while [ ! -e "$SOCKET_FILE" ]; do
     fi
 done
 
+echo "Xephyr socket detected! Proceeding..."
+# ==============================================================================
+
+# ==============================================================================
+# 2. Robust Guard: Wait explicitly for X-Server Socket to exist
+# ==============================================================================
 # Check if Xephyr process is actually still alive
 if ! kill -0 $XEPHYR_PID 2>/dev/null; then
     echo "Error: Xephyr process died immediately after socket creation. Check logs in $LOG_DIR"
