@@ -36,6 +36,7 @@ XEPHYR_PID=$!
 # ==============================================================================
 # FIX: Dynamic Socket Polling (Eliminates the Race Condition)
 # ==============================================================================
+sleep 5
 echo "Waiting for Xephyr socket to initialize..."
 
 # Strip the leading colon from ":99" to get "99" for the filename
@@ -58,6 +59,7 @@ echo "Xephyr socket detected! Proceeding..."
 
 # ==============================================================================
 # 2. Robust Guard: Wait explicitly for X-Server Socket to exist
+#!/bin/bash
 # ==============================================================================
 # Check if Xephyr process is actually still alive
 if ! kill -0 $XEPHYR_PID 2>/dev/null; then
